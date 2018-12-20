@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name" translatable="false">Popular Movies App</string>
+    <string name="movie_average" translatable="false">%1$s/10</string>
+    <string name="movie_detail_error" translatable="false">Não foi possível carregar os dados do filme.</string>
+
+    <string name="settings_menu" translatable="false">Opções</string>
+    <string name="settings_item_most_popular" translatable="false">Mais Populares</string>
+    <string name="settings_item_top_rated" translatable="false">Mais avaliados</string>
+    <string name="settings_value_item_most_popular" translatable="false">popular</string>
+    <string name="settings_value_item_top_rated" translatable="false">top_rated</string>
+    <string name="settings_movies_key" translatable="false">order_movies</string>
+    <string name="settings_movies_title" translatable="false">Ordenar filmes por:</string>
+</resources>

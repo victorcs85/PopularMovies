@@ -1,0 +1,92 @@
+apply plugin: 'com.android.application'
+
+repositories {
+    mavenCentral()
+    jcenter()
+    google()
+}
+
+android {
+    compileSdkVersion 28
+    defaultConfig {
+        applicationId "br.com.udacity.victorcs.popularmoviesapp"
+        minSdkVersion 15
+        targetSdkVersion 28
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            buildConfigField 'String', 'API_URL', '""'
+            buildConfigField 'String', 'API_KEY', '""'
+            buildConfigField 'String', 'API_TOKEN', '""'
+        }
+        debug {
+            buildConfigField 'String', 'API_URL', '""'
+            buildConfigField 'String', 'API_KEY', '""'
+            buildConfigField 'String', 'API_TOKEN', '""'
+            testCoverageEnabled true
+        }
+    }
+    compileOptions {
+        sourceCompatibility = '1.8'
+        targetCompatibility = '1.8'
+        incremental = false
+    }
+}
+
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+
+    def dependencies = rootProject.ext.dependencies
+
+    //Google Support
+    implementation dependencies.supportDesign
+    implementation dependencies.androidSupportCardView
+    implementation dependencies.appCompatV7
+    implementation dependencies.supportRecyclerView
+    implementation dependencies.supportConstraintLayout
+    implementation dependencies.supportPreferences
+
+    //DI
+    implementation dependencies.dagger
+    annotationProcessor dependencies.daggerCompiler
+
+    //RxKotlin
+    implementation dependencies.rxJava2Android
+    implementation dependencies.rxAndroidJava2
+    implementation dependencies.rxBinding2Android
+
+    //Timber log
+    implementation dependencies.timber
+
+    //Retrofit
+    implementation dependencies.okhttp
+    implementation dependencies.okhttpLogging
+    implementation dependencies.retrofit2
+    implementation dependencies.gsonConverter
+    implementation dependencies.gson
+    implementation dependencies.retrofitRxJava
+
+    //Permission
+    implementation dependencies.dexter
+
+    //Glide
+    implementation dependencies.glide
+    annotationProcessor dependencies.glideCompiler
+
+    //ButterKnife
+    implementation dependencies.butterKnife
+    annotationProcessor dependencies.butterKnifeProcessor
+
+    androidTestImplementation testDependencies.junit
+    androidTestImplementation testDependencies.junitRunner
+    androidTestImplementation testDependencies.runner
+    androidTestImplementation testDependencies.expressoCore
+    androidTestImplementation testDependencies.expressoContrib
+
+}
