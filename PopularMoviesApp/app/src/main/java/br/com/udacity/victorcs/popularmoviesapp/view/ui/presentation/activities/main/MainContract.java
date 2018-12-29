@@ -14,13 +14,15 @@ public interface MainContract {
     interface View extends BaseView {
         void initComponent();
         void setMoviesListIntoRecyclerView(ArrayList<Movie> movies);
+        void addNewMoviesListIntoRecyclerView(ArrayList<Movie> movies);
+        void verifyCallMovie(boolean loadMoreItems);
     }
 
     abstract class Presenter extends MvpPresenter<MainContract.View> {
 
         abstract void setView(MainContract.View view);
         abstract void onCreate();
-        abstract void getPopularMovies(int index);
-        abstract void getTopRatedMovies(int index);
+        abstract void getPopularMovies(int index, boolean loadMoreItems);
+        abstract void getTopRatedMovies(int index, boolean loadMoreItems);
     }
 }

@@ -32,7 +32,7 @@ public class MainPresenter extends MainContract.Presenter {
 
     @SuppressLint("CheckResult")
     @Override
-    void getPopularMovies(int index) {
+    void getPopularMovies(int index, boolean loadMoreItems) {
         try {
             view.showProgress();
             iMainInteractor.getPopularMoviesList(index)
@@ -42,7 +42,13 @@ public class MainPresenter extends MainContract.Presenter {
                     .doFinally(() -> view.hideProgress())
                     .doOnError(error -> view.showMessage(error.getMessage()) )
                     .subscribe(
-                            movies -> view.setMoviesListIntoRecyclerView(movies),
+                            movies -> {
+                                if(!loadMoreItems) {
+                                    view.setMoviesListIntoRecyclerView(movies);
+                                } else {
+                                    view.addNewMoviesListIntoRecyclerView(movies);
+                                }
+                            },
                             error -> view.showMessage(error.getMessage())
                     );
         } catch (Exception ex) {
@@ -53,7 +59,7 @@ public class MainPresenter extends MainContract.Presenter {
 
     @SuppressLint("CheckResult")
     @Override
-    void getTopRatedMovies(int index) {
+    void getTopRatedMovies(int index, boolean loadMoreItems) {
         try {
             view.showProgress();
             iMainInteractor.getTopRatedMoviesList(index)
@@ -62,7 +68,13 @@ public class MainPresenter extends MainContract.Presenter {
                     .observeOn(AndroidSchedulers.mainThread())
                     .doFinally(() -> view.hideProgress())
                     .subscribe(
-                            movies -> view.setMoviesListIntoRecyclerView(movies),
+                            movies -> {
+                                if(!loadMoreItems) {
+                                    view.setMoviesListIntoRecyclerView(movies);
+                                } else {
+                                    view.addNewMoviesListIntoRecyclerView(movies);
+                                }
+                                },
                             error -> view.showMessage(error.getMessage())
                     );
         } catch (Exception ex) {

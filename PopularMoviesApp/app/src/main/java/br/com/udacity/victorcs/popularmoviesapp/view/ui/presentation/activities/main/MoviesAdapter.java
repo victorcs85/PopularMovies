@@ -1,6 +1,7 @@
 package br.com.udacity.victorcs.popularmoviesapp.view.ui.presentation.activities.main;
 
 import android.content.Context;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -9,7 +10,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestOptions;
 
 import java.util.ArrayList;
 
@@ -39,6 +39,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieViewH
     public MoviesAdapter(Context context, ArrayList<Movie> moviesList) {
         this.context = context;
         this.moviesList = moviesList;
+        setHasStableIds(true);
     }
 
     @NonNull
@@ -55,7 +56,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieViewH
         Movie movie = moviesList.get(position);
         holder.movie = movie;
         String movieImagePath = Constants.MOVIE_URL_IMAGE + Constants.MOVIE_SIZE_IMAGE + movie.getPosterPath();
-        Glide.with(context).load(movieImagePath).into(holder.ivMovie);
+        setImage(holder, movieImagePath);
     }
 
     @Override
@@ -63,7 +64,21 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MovieViewH
         return moviesList.size();
     }
 
-    public ArrayList<Movie> getMoviesList() {
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
+
+    ArrayList<Movie> getMoviesList() {
         return moviesList;
+    }
+
+    void addItems(ArrayList<Movie> newMovies) {
+        moviesList.addAll(newMovies);
+        notifyDataSetChanged();
+    }
+
+    private void setImage(@NonNull MovieViewHolder holder, String movieImagePath) {
+        new Handler().post(() -> Glide.with(context).load(movieImagePath).into(holder.ivMovie));
     }
 }

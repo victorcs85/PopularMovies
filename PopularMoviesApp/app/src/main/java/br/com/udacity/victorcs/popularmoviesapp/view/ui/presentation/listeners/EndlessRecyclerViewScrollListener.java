@@ -11,6 +11,7 @@ import android.widget.AbsListView;
  */
 public abstract class EndlessRecyclerViewScrollListener extends RecyclerView.OnScrollListener {
 
+
     private int visibleThreshold = 5;
 
     private int currentPage = 0;
@@ -49,7 +50,6 @@ public abstract class EndlessRecyclerViewScrollListener extends RecyclerView.OnS
         }
         return maxSize;
     }
-
 
     @Override
     public void onScrolled(RecyclerView view, int dx, int dy) {

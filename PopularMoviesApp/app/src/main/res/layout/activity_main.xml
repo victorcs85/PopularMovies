@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:animateLayoutChanges="true"
     android:background="@color/black"
     tools:context=".view.ui.presentation.activities.main.MainActivity">
 
@@ -26,6 +25,8 @@
         android:layout_height="match_parent"
         android:visibility="gone"
         android:scrollbars="vertical"
+        android:animateLayoutChanges="false"
+        android:adjustViewBounds="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"

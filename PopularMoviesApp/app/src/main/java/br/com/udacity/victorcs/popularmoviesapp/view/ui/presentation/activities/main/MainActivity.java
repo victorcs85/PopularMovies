@@ -25,6 +25,7 @@ import br.com.udacity.victorcs.popularmoviesapp.view.ui.presentation.activities.
 import br.com.udacity.victorcs.popularmoviesapp.view.ui.presentation.activities.detail.MovieDetailActivity;
 import br.com.udacity.victorcs.popularmoviesapp.view.ui.presentation.activities.settings.SettingsActivity;
 import br.com.udacity.victorcs.popularmoviesapp.view.ui.presentation.listeners.EndlessRecyclerViewScrollListener;
+import br.com.udacity.victorcs.popularmoviesapp.view.ui.presentation.logs.TimberHelper;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -81,7 +82,7 @@ public class MainActivity extends BaseActivity implements MainContract.View {
     protected void setupFlux() {
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
         isLoadByScroll = false;
-        verifyCallMovie();
+        verifyCallMovie(false);
     }
 
     @Override
@@ -95,7 +96,6 @@ public class MainActivity extends BaseActivity implements MainContract.View {
         rvMovies.setHasFixedSize(true);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2);
         rvMovies.setLayoutManager(gridLayoutManager);
-        rvMovies.setItemAnimator(new DefaultItemAnimator());
 
         rvMovies.addOnItemTouchListener(new RecyclerTouchListener(getApplicationContext(), rvMovies, new
                 RecyclerTouchListener.ClickListener() {
@@ -123,12 +123,20 @@ public class MainActivity extends BaseActivity implements MainContract.View {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
                 currentListIndex = page;
-                if(currentListIndex > 1) {
+                if (currentListIndex > 1) {
                     isLoadByScroll = true;
                 }
-                verifyCallMovie();
+                verifyCallMovie(true);
             }
         });
+
+       /* rvMovies.post(() -> {
+            if (rvMovies.getAdapter() != null) {
+                rvMovies.getAdapter().notifyItemInserted(
+                        ((MoviesAdapter) rvMovies.getAdapter()).getMoviesList().size() - 1);
+            }
+        });*/
+
     }
 
     @Override
@@ -138,11 +146,19 @@ public class MainActivity extends BaseActivity implements MainContract.View {
     }
 
     @Override
+    public void addNewMoviesListIntoRecyclerView(ArrayList<Movie> movies) {
+        if (rvMovies.getAdapter() != null) {
+            ((MoviesAdapter) rvMovies.getAdapter()).addItems(movies);
+        }
+    }
+
+    @Override
     public void showProgress() {
-        rvMovies.setVisibility(View.GONE);
-        if(!isLoadByScroll) {
+        if (!isLoadByScroll) {
+            rvMovies.setVisibility(View.GONE);
             pbLoading.setVisibility(View.VISIBLE);
         }
+        TimberHelper.e(Constants.ERROR, isLoadByScroll+" +++++++++++++");
     }
 
     @Override
@@ -157,25 +173,26 @@ public class MainActivity extends BaseActivity implements MainContract.View {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         AlertDialog alertDialog = builder.setMessage(message)
                 .setPositiveButton(android.R.string.ok, (dialog, id) -> {
-                    verifyCallMovie();
+                    verifyCallMovie(true);
                     dialog.dismiss();
                 }).create();
         alertDialog.show();
     }
 
-    private void verifyCallMovie() {
+    @Override
+    public void verifyCallMovie(boolean loadMoreItems) {
         String order = preferences.getString("order_movies", Constants.MOST_POPULAR);
         if (order == null || order.equalsIgnoreCase(Constants.MOST_POPULAR)) {
-            mainPresenter.getPopularMovies(currentListIndex);
+            mainPresenter.getPopularMovies(currentListIndex, loadMoreItems);
         } else {
-            mainPresenter.getTopRatedMovies(currentListIndex);
+            mainPresenter.getTopRatedMovies(currentListIndex, loadMoreItems);
         }
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        if(rvMovies != null && rvMovies.getLayoutManager() != null) {
+        if (rvMovies != null && rvMovies.getLayoutManager() != null) {
             outState.putParcelable(KEY_FOR_LAYOUT_MANAGER_STATE, rvMovies.getLayoutManager().onSaveInstanceState());
         }
     }
@@ -183,7 +200,7 @@ public class MainActivity extends BaseActivity implements MainContract.View {
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        if(rvMovies != null && rvMovies.getLayoutManager() != null) {
+        if (rvMovies != null && rvMovies.getLayoutManager() != null) {
             Parcelable parcelable = savedInstanceState.getParcelable(KEY_FOR_LAYOUT_MANAGER_STATE);
             rvMovies.getLayoutManager().onRestoreInstanceState(parcelable);
         }
@@ -193,7 +210,7 @@ public class MainActivity extends BaseActivity implements MainContract.View {
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         rvMovies.requestLayout();
-        if(rvMovies.getAdapter() != null) {
+        if (rvMovies.getAdapter() != null) {
             rvMovies.getAdapter().notifyDataSetChanged();
         }
     }
