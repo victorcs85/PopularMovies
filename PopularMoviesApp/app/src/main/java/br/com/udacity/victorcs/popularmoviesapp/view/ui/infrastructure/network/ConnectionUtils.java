@@ -5,11 +5,12 @@ import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkInfo;
 import android.os.Build;
-import android.util.Log;
 
 import java.net.InetAddress;
 
 import br.com.udacity.victorcs.popularmoviesapp.view.ui.domain.Constants;
+import br.com.udacity.victorcs.popularmoviesapp.view.ui.presentation.logs.TimberHelper;
+
 /**
  * Created by victorcs on 12/13/2018.
  */
@@ -47,7 +48,7 @@ public class ConnectionUtils {
             InetAddress ipAddr = InetAddress.getByName("google.com");
             return !ipAddr.toString().equals("");
         } catch (Exception e) {
-            Log.e(Constants.ERROR, "Erro internet: "+ e.getMessage());
+            TimberHelper.e(Constants.ERROR, "Erro internet: " + e.getMessage());
             return false;
         }
 
