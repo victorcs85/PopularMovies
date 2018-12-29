@@ -2,12 +2,15 @@ package br.com.udacity.victorcs.popularmoviesapp.view.ui.infrastructure.receiver
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * Created by victorcs on 12/13/2018.
  */
-public class MoviesResult {
+public class MoviesResult implements Serializable {
+
+    private static final long serialVersionUID = 9208879773123352564L;
 
     @SerializedName("page")
     private Integer page;

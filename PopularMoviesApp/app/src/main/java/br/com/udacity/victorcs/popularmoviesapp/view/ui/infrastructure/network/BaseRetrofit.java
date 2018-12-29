@@ -15,7 +15,7 @@ import io.reactivex.exceptions.UndeliverableException;
 import io.reactivex.plugins.RxJavaPlugins;
 import retrofit2.Response;
 
-public abstract class BaseRetrofft {
+public abstract class BaseRetrofit {
 
     private Boolean errorFound = false;
 

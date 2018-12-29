@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import br.com.udacity.victorcs.popularmoviesapp.BuildConfig;
 import br.com.udacity.victorcs.popularmoviesapp.view.ui.domain.Constants;
 import br.com.udacity.victorcs.popularmoviesapp.view.ui.domain.repository.IMoviesRepository;
-import br.com.udacity.victorcs.popularmoviesapp.view.ui.infrastructure.network.BaseRetrofft;
+import br.com.udacity.victorcs.popularmoviesapp.view.ui.infrastructure.network.BaseRetrofit;
 import br.com.udacity.victorcs.popularmoviesapp.view.ui.infrastructure.network.RetrofitFactory;
 import br.com.udacity.victorcs.popularmoviesapp.view.ui.infrastructure.network.TheMovieApi;
 import br.com.udacity.victorcs.popularmoviesapp.view.ui.infrastructure.network.error.MovieError;
@@ -15,13 +15,19 @@ import br.com.udacity.victorcs.popularmoviesapp.view.ui.presentation.logs.Timber
 import io.reactivex.Maybe;
 import retrofit2.Response;
 
-public class MoviesRetrofit extends BaseRetrofft implements IMoviesRepository {
+public class MoviesRetrofit extends BaseRetrofit implements IMoviesRepository {
+
+    public MoviesRetrofit() {
+        this.retrofitFactory = new RetrofitFactory();
+    }
+
+    RetrofitFactory retrofitFactory;
 
     @Override
     public Maybe<ArrayList<Movie>> getPopularMoviesList(int index) {
         return Maybe.create(emitter -> {
             try {
-                Response<MoviesResult> response = new RetrofitFactory()
+                Response<MoviesResult> response = retrofitFactory
                         .baseRequest()
                         .create(TheMovieApi.class)
                         .getPopularList(BuildConfig.API_KEY, index)
@@ -49,7 +55,7 @@ public class MoviesRetrofit extends BaseRetrofft implements IMoviesRepository {
     public Maybe<ArrayList<Movie>> getTopRatedMoviesList(int index) {
         return Maybe.create(emitter -> {
             try {
-                Response<MoviesResult> response = new RetrofitFactory()
+                Response<MoviesResult> response = retrofitFactory
                         .baseRequest()
                         .create(TheMovieApi.class)
                         .getTopRatedList(BuildConfig.API_KEY, index)

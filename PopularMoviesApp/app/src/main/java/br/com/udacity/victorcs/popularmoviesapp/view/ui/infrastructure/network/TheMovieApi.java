@@ -13,7 +13,7 @@ public interface TheMovieApi {
     Call<MoviesResult> getPopularList(@Query("api_key") String user_key,
                                       @Query("page") int pageNumber);
 
-    @GET("/movie/top_rated")
+    @GET("movie/top_rated")
     Call<MoviesResult> getTopRatedList(@Query("api_key") String user_key,
                                              @Query("page") int pageNumber);
 

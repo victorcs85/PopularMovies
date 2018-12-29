@@ -16,10 +16,7 @@ public interface MovieDetailContract {
 
     abstract class Presenter extends MvpPresenter<MovieDetailContract.View> {
 
-        public Presenter(View view) {
-            super(view);
-        }
-
+        abstract void onCreate();
         abstract void callShowMessage(String errorMessage);
         abstract void setSelectedMovie(Movie selectedMovie);
     }

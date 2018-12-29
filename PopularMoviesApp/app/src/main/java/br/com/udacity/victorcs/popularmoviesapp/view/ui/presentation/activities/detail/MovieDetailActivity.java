@@ -13,13 +13,15 @@ import com.bumptech.glide.Glide;
 import br.com.udacity.victorcs.popularmoviesapp.R;
 import br.com.udacity.victorcs.popularmoviesapp.view.ui.domain.Constants;
 import br.com.udacity.victorcs.popularmoviesapp.view.ui.infrastructure.receiver.Movie;
+import br.com.udacity.victorcs.popularmoviesapp.view.ui.presentation.activities.BaseActivity;
 import br.com.udacity.victorcs.popularmoviesapp.view.ui.presentation.logs.TimberHelper;
 import butterknife.BindView;
+import butterknife.ButterKnife;
 
 /**
  * Created by victorcs on 12/18/2018.
  */
-public class MovieDetailActivity extends AppCompatActivity implements MovieDetailContract.View {
+public class MovieDetailActivity extends BaseActivity implements MovieDetailContract.View {
 
     @BindView(R.id.pbLoading)
     ProgressBar pbLoading;
@@ -34,18 +36,31 @@ public class MovieDetailActivity extends AppCompatActivity implements MovieDetai
     @BindView(R.id.tvSynopsis)
     TextView tvSynopsis;
 
+    private MovieDetailPresenter detailPresenter;
+    private Movie selectedMovie;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_detail);
+        ButterKnife.bind(this);
         verifyMovieExtra();
     }
 
     private void verifyMovieExtra() {
-        Movie movie = (Movie) getIntent().getSerializableExtra(Constants.MOVIE_DETAIL);
-        if(movie != null) {
-            //TODO presenter
-        }
+        selectedMovie = (Movie) getIntent().getSerializableExtra(Constants.MOVIE_DETAIL);
+    }
+
+    @Override
+    protected void initializePresenter() {
+        detailPresenter = new MovieDetailPresenter();
+        detailPresenter.setView(this);
+        detailPresenter.onCreate();
+    }
+
+    @Override
+    protected void setupFlux() {
+        detailPresenter.setSelectedMovie(selectedMovie);
     }
 
     @Override
@@ -59,7 +74,8 @@ public class MovieDetailActivity extends AppCompatActivity implements MovieDetai
             tvSynopsis.setText(movieSynopsis);
         } catch (Exception ex) {
             TimberHelper.e(Constants.ERROR, ex.toString());
-            //TODO chamar error do presenter
+            String errorMessage = ex.getMessage() == null ? "" : ex.getMessage();
+            detailPresenter.callShowMessage(errorMessage);
         }
     }
 
@@ -92,4 +108,5 @@ public class MovieDetailActivity extends AppCompatActivity implements MovieDetai
                 }).create();
         alertDialog.show();
     }
+
 }

@@ -8,6 +8,7 @@ import java.util.concurrent.TimeUnit;
 import br.com.udacity.victorcs.popularmoviesapp.BuildConfig;
 import br.com.udacity.victorcs.popularmoviesapp.view.ui.domain.Constants;
 import br.com.udacity.victorcs.popularmoviesapp.view.ui.presentation.logs.TimberHelper;
+import io.reactivex.schedulers.Schedulers;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
@@ -19,6 +20,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 public class RetrofitFactory {
 
+    public RetrofitFactory() {}
+
     public Retrofit baseRequest() {
         if (!ConnectionUtils.isInternetAvailable()) {
             try {
@@ -28,11 +31,12 @@ public class RetrofitFactory {
             }
         }
 
-        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor(message -> TimberHelper.i("OkHttp", message));
+        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor(message ->
+                TimberHelper.i("OkHttp", message));
 
         interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
 
-        PopularHeaders etnaInterceptor = new PopularHeaders();
+        PopularHeaders headersInterceptor = new PopularHeaders();
 
         OkHttpClient.Builder build = new OkHttpClient.Builder();
         long timeoutSecs = 35L;
@@ -40,15 +44,16 @@ public class RetrofitFactory {
                 .writeTimeout(timeoutSecs, TimeUnit.SECONDS)
                 .readTimeout(timeoutSecs, TimeUnit.SECONDS)
                 .addInterceptor(interceptor)
-                .addInterceptor(etnaInterceptor);
+                .addInterceptor(headersInterceptor);
 
         Gson gson = new GsonBuilder()
                 .setLenient()
                 .create();
 
         Retrofit.Builder retroBuilder = new Retrofit.Builder()
-                .addConverterFactory(GsonConverterFactory.create(gson))
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory
+                        .createWithScheduler(Schedulers.io()))
                 .baseUrl(BuildConfig.API_URL)
                 .client(build.build());
 

@@ -17,6 +17,7 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
         <activity android:name=".view.ui.presentation.activities.main.MainActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
             android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -24,8 +25,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".view.ui.presentation.activities.detail.MovieDetailActivity" />
-        <activity android:name=".view.ui.presentation.activities.settings.SettingsActivity"/>
+        <activity android:name=".view.ui.presentation.activities.detail.MovieDetailActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:parentActivityName=".view.ui.presentation.activities.main.MainActivity" />
+        <activity android:name=".view.ui.presentation.activities.settings.SettingsActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"/>
     </application>
 
 </manifest>

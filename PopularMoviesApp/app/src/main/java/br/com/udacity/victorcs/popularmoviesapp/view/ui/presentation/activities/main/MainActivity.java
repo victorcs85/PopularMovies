@@ -3,7 +3,9 @@ package br.com.udacity.victorcs.popularmoviesapp.view.ui.presentation.activities
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
@@ -24,29 +26,31 @@ import br.com.udacity.victorcs.popularmoviesapp.view.ui.presentation.activities.
 import br.com.udacity.victorcs.popularmoviesapp.view.ui.presentation.activities.settings.SettingsActivity;
 import br.com.udacity.victorcs.popularmoviesapp.view.ui.presentation.listeners.EndlessRecyclerViewScrollListener;
 import butterknife.BindView;
+import butterknife.ButterKnife;
 
 /**
  * Created by victorcs on 12/15/2018.
  */
 public class MainActivity extends BaseActivity implements MainContract.View {
 
+    public static final String KEY_FOR_LAYOUT_MANAGER_STATE = "KeyForLayoutManagerState";
     @BindView(R.id.rvMovies)
     RecyclerView rvMovies;
     @BindView(R.id.pbLoading)
     ProgressBar pbLoading;
 
-    SharedPreferences preferences;
+    MainPresenter mainPresenter;
+
+    private SharedPreferences preferences;
+
+    private int currentListIndex = 1;
+    private boolean isLoadByScroll = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        String order = preferences.getString("order_movies", Constants.MOST_POPULAR);
-        if(order == null || order.equalsIgnoreCase(Constants.MOST_POPULAR)) {
-            //TODO
-        }
-        //TODO - presenter
+        ButterKnife.bind(this);
     }
 
     @Override
@@ -58,12 +62,32 @@ public class MainActivity extends BaseActivity implements MainContract.View {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId() == R.id.action_settings) {
+        if (item.getItemId() == R.id.action_settings) {
             Intent startSettingsActivity = new Intent(this, SettingsActivity.class);
             startActivity(startSettingsActivity);
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void initializePresenter() {
+        mainPresenter = new MainPresenter();
+        mainPresenter.setView(this);
+        mainPresenter.onCreate();
+    }
+
+    @Override
+    protected void setupFlux() {
+        preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        isLoadByScroll = false;
+        verifyCallMovie();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mainPresenter.onDetach();
     }
 
     @Override
@@ -95,20 +119,16 @@ public class MainActivity extends BaseActivity implements MainContract.View {
                     }
                 }));
 
-        EndlessRecyclerViewScrollListener listener = new EndlessRecyclerViewScrollListener(gridLayoutManager) {
+        rvMovies.addOnScrollListener(new EndlessRecyclerViewScrollListener(gridLayoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
-                String order = preferences.getString("order_movies", Constants.MOST_POPULAR);
-                //TODO
-                if(order == null || order.equalsIgnoreCase(Constants.MOST_POPULAR)){
-//                    presenter.getPopularMovies(page);
-                } else {
-//                    presenter.getTopRatedMovies(page);
+                currentListIndex = page;
+                if(currentListIndex > 1) {
+                    isLoadByScroll = true;
                 }
+                verifyCallMovie();
             }
-        };
-
-        rvMovies.addOnScrollListener(listener);
+        });
     }
 
     @Override
@@ -120,13 +140,16 @@ public class MainActivity extends BaseActivity implements MainContract.View {
     @Override
     public void showProgress() {
         rvMovies.setVisibility(View.GONE);
-        pbLoading.setVisibility(View.VISIBLE);
+        if(!isLoadByScroll) {
+            pbLoading.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
     public void hideProgress() {
-        rvMovies.setVisibility(View.VISIBLE);
         pbLoading.setVisibility(View.GONE);
+        rvMovies.setVisibility(View.VISIBLE);
+        isLoadByScroll = false;
     }
 
     @Override
@@ -134,9 +157,44 @@ public class MainActivity extends BaseActivity implements MainContract.View {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         AlertDialog alertDialog = builder.setMessage(message)
                 .setPositiveButton(android.R.string.ok, (dialog, id) -> {
-                    //TODO - efetuar nova chamada com o última posição do scroll
+                    verifyCallMovie();
                     dialog.dismiss();
                 }).create();
         alertDialog.show();
+    }
+
+    private void verifyCallMovie() {
+        String order = preferences.getString("order_movies", Constants.MOST_POPULAR);
+        if (order == null || order.equalsIgnoreCase(Constants.MOST_POPULAR)) {
+            mainPresenter.getPopularMovies(currentListIndex);
+        } else {
+            mainPresenter.getTopRatedMovies(currentListIndex);
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if(rvMovies != null && rvMovies.getLayoutManager() != null) {
+            outState.putParcelable(KEY_FOR_LAYOUT_MANAGER_STATE, rvMovies.getLayoutManager().onSaveInstanceState());
+        }
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        if(rvMovies != null && rvMovies.getLayoutManager() != null) {
+            Parcelable parcelable = savedInstanceState.getParcelable(KEY_FOR_LAYOUT_MANAGER_STATE);
+            rvMovies.getLayoutManager().onRestoreInstanceState(parcelable);
+        }
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        rvMovies.requestLayout();
+        if(rvMovies.getAdapter() != null) {
+            rvMovies.getAdapter().notifyDataSetChanged();
+        }
     }
 }

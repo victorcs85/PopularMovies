@@ -16,7 +16,7 @@ ext {
     timberVersion = '4.7.1'
 
     //DI
-    daggerVersion = '2.16'
+    daggerVersion = '2.17'
 
     //ButterKnife
     butterKnifeVersion = '9.0.0-rc2'
@@ -36,6 +36,7 @@ ext {
             supportPreferences     : "com.android.support:preference-v7:${supportLibraryVersion}",
 
             dagger                 : "com.google.dagger:dagger:${daggerVersion}",
+            daggerSupport          : "com.google.dagger:dagger-android-support:${daggerVersion}",
             daggerCompiler         : "com.google.dagger:dagger-compiler:${daggerVersion}",
 
             rxJava2Android         : "io.reactivex.rxjava2:rxandroid:${rxJava2AndroidVersion}",

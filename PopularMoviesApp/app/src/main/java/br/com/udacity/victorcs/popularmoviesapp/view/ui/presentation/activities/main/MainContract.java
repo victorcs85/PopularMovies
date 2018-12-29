@@ -18,10 +18,7 @@ public interface MainContract {
 
     abstract class Presenter extends MvpPresenter<MainContract.View> {
 
-        public Presenter(View view) {
-            super(view);
-        }
-
+        abstract void setView(MainContract.View view);
         abstract void onCreate();
         abstract void getPopularMovies(int index);
         abstract void getTopRatedMovies(int index);

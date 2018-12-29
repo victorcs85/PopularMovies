@@ -2,8 +2,7 @@ package br.com.udacity.victorcs.popularmoviesapp.view.ui.domain.repository;
 
 import java.util.ArrayList;
 
-import javax.inject.Inject;
-
+import br.com.udacity.victorcs.popularmoviesapp.view.ui.infrastructure.network.retrofit.MoviesRetrofit;
 import br.com.udacity.victorcs.popularmoviesapp.view.ui.infrastructure.receiver.Movie;
 import io.reactivex.Maybe;
 /**
@@ -13,8 +12,8 @@ public class MoviesRepository implements IMoviesRepository {
 
     private IMoviesRepository iMoviesRepository;
 
-    @Inject public MoviesRepository(IMoviesRepository iMoviesRepository) {
-        this.iMoviesRepository = iMoviesRepository;
+    public MoviesRepository() {
+        this.iMoviesRepository = new MoviesRetrofit();
     }
 
     @Override

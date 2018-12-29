@@ -3,7 +3,7 @@ package br.com.udacity.victorcs.popularmoviesapp.view.ui.presentation.core;
 import dagger.Lazy;
 import io.reactivex.disposables.CompositeDisposable;
 
-public class MvpPresenter<T extends BaseView> implements BasePresenter {
+public abstract class MvpPresenter<T extends BaseView> {
 
     private Lazy<CompositeDisposable> disposable = () -> {
         CompositeDisposable val = new CompositeDisposable();
@@ -13,16 +13,10 @@ public class MvpPresenter<T extends BaseView> implements BasePresenter {
 
     private T view = null;
 
-    public MvpPresenter(T view) {
+    public void onAttach(T view) {
         this.view = view;
     }
 
-    @Override
-    public void onAttach() {
-
-    }
-
-    @Override
     public void onDetach() {
         disposable.get().clear();
         this.view = null;
